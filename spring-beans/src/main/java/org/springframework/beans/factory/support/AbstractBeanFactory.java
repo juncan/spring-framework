@@ -241,10 +241,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
+		//根据指定的名称获取被管理Bean的名称，剥离指定名称中对容器的相关依赖
+		//如果指定的是别名，将别名转换为规范的Bean名称
 		String beanName = transformedBeanName(name);
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		//先从缓存中获取是否已经有被创建过的单态类型的Bean
+		//对于单例模式的Bean整个Ioc容器中只创建一次，不需要重复创建
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {

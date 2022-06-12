@@ -131,18 +131,23 @@ public class BeanDefinitionValueResolver {
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		//对引用类型的属性进行解析
 		if (value instanceof RuntimeBeanReference ref) {
+			//调用引用类型属性的解析方法
 			return resolveReference(argName, ref);
 		}
+		//对属性值是引用容器中另一个Bean名称的解析
 		else if (value instanceof RuntimeBeanNameReference ref) {
 			String refName = ref.getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
+			//从容器中获取指定名称的Bean
 			if (!this.beanFactory.containsBean(refName)) {
 				throw new BeanDefinitionStoreException(
 						"Invalid bean name '" + refName + "' in bean reference for " + argName);
 			}
 			return refName;
 		}
+		//对Bean类型属性的解析，只要是Bean中的内部类
 		else if (value instanceof BeanDefinitionHolder bdHolder) {
 			// Resolve BeanDefinitionHolder: contains BeanDefinition with name and aliases.
 			return resolveInnerBean(bdHolder.getBeanName(), bdHolder.getBeanDefinition(),
@@ -163,6 +168,7 @@ public class BeanDefinitionValueResolver {
 			}
 			return result;
 		}
+		//对集合数组类型的属性解析
 		else if (value instanceof ManagedArray managedArray) {
 			// May need to resolve contained runtime references.
 			Class<?> elementType = managedArray.resolvedElementType;
@@ -186,6 +192,7 @@ public class BeanDefinitionValueResolver {
 			}
 			return resolveManagedArray(argName, (List<?>) value, elementType);
 		}
+		//解析list类型属性值
 		else if (value instanceof ManagedList<?> managedList) {
 			// May need to resolve contained runtime references.
 			return resolveManagedList(argName, managedList);
