@@ -264,6 +264,11 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			if (nestedPa == this) {
 				pv.getOriginalPropertyValue().resolvedTokens = tokens;
 			}
+			/**
+			 * ！！！！！！！！！！！！！！！
+			 * 进入 bean 属性值注入的具体实现
+			 * ！！！！！！！！！！！！！！！
+			 */
 			nestedPa.setPropertyValue(tokens, pv);
 		}
 		else {
@@ -309,6 +314,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 					int lastKeyIndex = tokens.canonicalName.lastIndexOf('[');
 					String propName = tokens.canonicalName.substring(0, lastKeyIndex);
 					setPropertyValue(propName, newArray);
+					//通过反射机制，调用属性的getter方法获取属性值
 					propValue = getPropertyValue(propName);
 				}
 				Array.set(propValue, arrayIndex, convertedValue);

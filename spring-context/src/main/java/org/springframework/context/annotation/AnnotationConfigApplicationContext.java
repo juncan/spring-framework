@@ -55,8 +55,10 @@ import org.springframework.util.Assert;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
+	//保存一个读取注解的Bean定义读取器，并将其设置到容器中
 	private final AnnotatedBeanDefinitionReader reader;
 
+	//保存一个扫描指定类路径中注解Bean定义的扫描器，并将其设置到容器中
 	private final ClassPathBeanDefinitionScanner scanner;
 
 
@@ -101,6 +103,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
+		//扫描包
 		scan(basePackages);
 		refresh();
 	}

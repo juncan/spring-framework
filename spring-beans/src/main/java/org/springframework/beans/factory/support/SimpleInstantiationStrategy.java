@@ -54,6 +54,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 
+	//使用初始化策略实例化bean对象
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
@@ -67,6 +68,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				if (constructorToUse == null) {
 					//使用JDK的反射机制，判断要实例化的Bean是否是接口
 					final Class<?> clazz = bd.getBeanClass();
+					//如果clazz是一个接口，直接抛出异常
 					if (clazz.isInterface()) {
 						throw new BeanInstantiationException(clazz, "Specified class is an interface");
 					}

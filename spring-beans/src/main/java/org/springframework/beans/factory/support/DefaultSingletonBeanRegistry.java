@@ -74,12 +74,31 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
+	/**
+	 * 存放的是单例bean的映射
+	 *
+	 * 对应关系为bean name  --> bean instance
+	 */
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	/**
+	 * 存放的是ObjectFactory,可以理解为创建单例bean的factory
+	 *
+	 * 对应关系是 bean name --> objectFactory
+	 */
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
+	/**
+	 * 存放的是早期的bean，对应关系也是bean name --> bean instance
+	 * 它与{@link #singletonFactories} 区别在于earlySingletonObjects中存放的bean不一定完整
+	 *
+	 * 从{@link #getSingleton(String)} 方法中，我们可以了解，bean在创建过程中就已经加入到earlySingleObjects中了，
+	 * 所以当在bean的创建过程中，就可以通过getBean()方法获取
+	 *
+	 * 这个Map也是【循环依赖】的关键所在
+	 */
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
@@ -179,20 +198,28 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
+		//从单例缓存中加载Bean
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//缓存中的bean为空，且当前bean正在创建
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			singletonObject = this.earlySingletonObjects.get(beanName);
+			//earlySingletonObjects中没有，且允许提前创建
 			if (singletonObject == null && allowEarlyReference) {
+				//加锁
 				synchronized (this.singletonObjects) {
 					// Consistent creation of early reference within full singleton lock
 					singletonObject = this.singletonObjects.get(beanName);
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
+							//从singletonFactories中获取对应的ObjectFactory
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
+								//获取Bean
 								singletonObject = singletonFactory.getObject();
+								//添加Bean到earlySingletonObjects中
 								this.earlySingletonObjects.put(beanName, singletonObject);
+								//从singletonFactories中移除对应的objectFactory
 								this.singletonFactories.remove(beanName);
 							}
 						}

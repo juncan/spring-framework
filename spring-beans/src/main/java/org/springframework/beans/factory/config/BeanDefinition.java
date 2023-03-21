@@ -155,6 +155,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	void setDependsOn(@Nullable String... dependsOn);
 
 	/**
+	 * 返回当前bean所依赖的其他bean的名称
 	 * Return the bean names that this bean depends on.
 	 */
 	@Nullable

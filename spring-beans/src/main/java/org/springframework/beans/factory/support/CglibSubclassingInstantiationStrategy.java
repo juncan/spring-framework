@@ -72,6 +72,8 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 	private static final int METHOD_REPLACER = 2;
 
 
+	//下面两个方法都通过实例化自己的私有静态内部类CglibSubclassCreator
+	//然后调用该内部类对象的实例化方法instance()完成实例化
 	@Override
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		return instantiateWithMethodInjection(bd, beanName, owner, null);
@@ -104,6 +106,9 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 			this.owner = owner;
 		}
 
+		/**
+		 * 使用CGLIB进行bean对象实例化
+		 */
 		/**
 		 * Create a new instance of a dynamically generated subclass implementing the
 		 * required lookups.
